@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="robots" content="noindex">
+<title>Entrar · ImageToCad</title>
+<style>
+  :root { --bg:#f3f5f8; --card:#fff; --ink:#1c2430; --mute:#5d6b7c; --line:#d9dee5; --acc:#1f6feb; --acc2:#1558c0; --err:#b42318; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#10151c; --card:#18202a; --ink:#e6ebf2; --mute:#97a4b5; --line:#2b3745; --acc:#4c8dff; --acc2:#6fa3ff; --err:#ff8b80; } }
+  * { box-sizing:border-box; }
+  body { margin:0; min-height:100vh; display:grid; place-items:center; padding:16px; font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif; background:var(--bg); color:var(--ink); }
+  form { width:min(380px,100%); background:var(--card); border:1px solid var(--line); border-radius:14px; padding:28px; box-shadow:0 2px 10px rgba(0,0,0,.06); }
+  .brand { display:flex; align-items:center; gap:10px; margin-bottom:6px; } .brand svg { width:30px; height:30px; color:var(--acc); }
+  h1 { font-size:20px; margin:0; } p { margin:0 0 18px; color:var(--mute); font-size:13px; }
+  label { display:block; margin:12px 0 4px; color:var(--mute); font-size:13px; }
+  input { font:inherit; width:100%; padding:10px; border:1px solid var(--line); border-radius:8px; background:var(--card); color:var(--ink); }
+  input:focus-visible, button:focus-visible { outline:2px solid var(--acc); outline-offset:2px; }
+  button { font:inherit; width:100%; margin-top:18px; padding:11px; border-radius:8px; border:1px solid var(--acc); background:var(--acc); color:#fff; font-weight:600; cursor:pointer; }
+  button:hover:not(:disabled) { background:var(--acc2); } button:disabled { opacity:.6; cursor:wait; }
+  #msg { min-height:20px; margin-top:12px; color:var(--err); font-size:13px; }
+</style>
+</head>
+<body>
+<form id="f" autocomplete="on">
+  <div class="brand">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l9 4 9-4M3 12l9 4 9-4M12 3l9 4.5-9 4.5L3 7.5z"/></svg>
+    <h1>ImageToCad</h1>
+  </div>
+  <p>Entra para convertir imágenes en planos CAD.</p>
+  <label for="user">Usuario</label>
+  <input id="user" name="username" autocomplete="username" autocapitalize="none" required autofocus>
+  <label for="pass">Contraseña</label>
+  <input id="pass" name="password" type="password" autocomplete="current-password" required>
+  <button id="go" type="submit">Entrar</button>
+  <div id="msg" role="alert" aria-live="assertive"></div>
+</form>
+<script>
+const $ = id => document.getElementById(id);
+$('f').onsubmit = async e => {
+  e.preventDefault(); $('go').disabled = true; $('msg').textContent = '';
+  try {
+    const r = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user: $('user').value, password: $('pass').value }) });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(j.error || 'Error ' + r.status);
+    location.href = '/';
+  } catch (err) { $('msg').textContent = err.message; $('pass').value = ''; $('pass').focus(); }
+  finally { $('go').disabled = false; }
+};
+</script>
+</body>
+</html>

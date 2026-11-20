@@ -1,0 +1,5 @@
+anthropic
+flask
+ezdxf
+matplotlib
+pillow
